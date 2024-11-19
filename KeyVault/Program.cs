@@ -9,4 +9,5 @@ var credentials = new ClientSecretCredential(tenantId, clientId, clientSecret);
 
 var secretClient = new SecretClient(vaultUri, credentials);
 var secret = secretClient.GetSecret("<SECRET NAME>");
-Console.WriteLine(secret.Value.Value);
+var keyVaultSecret = secret.Value;
+Console.WriteLine(keyVaultSecret.Value);
