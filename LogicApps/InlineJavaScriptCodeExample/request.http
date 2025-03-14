@@ -1,0 +1,9 @@
+@endpoint = YourEndpoint
+
+POST {{endpoint}}
+Content-Type: text/plain
+
+H::2025-03-252400539109      675488746                                    
+P::1      5550-1          2       9.90        19.80                       
+P::2      861541234       1       899.00      899.00                      
+T::2400539109                                                              

@@ -1,0 +1,42 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Disassemble_Order_Flat_File": {
+        "type": "JavaScriptCode",
+        "inputs": {
+          "code": "var body = workflowContext.trigger.outputs.body;\r\n\r\nvar lines = body.split(\"\\r\\n\");\r\nvar json = {\r\n    positions: []\r\n};\r\nvar positions = [];\r\n\r\nlines.forEach(line => {\r\n    if(line.startsWith(\"H::\")) {\r\n        json.orderDate = line.substring(3, 13).trim();\r\n        json.orderId = line.substring(13, 29).trim();\r\n        json.customerId = line.substring(29, 39).trim();\r\n    } else if(line.startsWith(\"P::\")) {\r\n        json.positions.push({\r\n            id: line.substring(3, 10).trim(),\r\n            articleId: line.substring(10, 26).trim(),\r\n            amount: line.substring(26, 34).trim(),\r\n            price: line.substring(34, 46).trim(),\r\n            total: line.substring(46, 56).trim()\r\n        });\r\n    }\r\n});\r\n\r\nreturn json;"
+        },
+        "runAfter": {}
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "headers": {
+            "content-type": "application/json"
+          },
+          "body": "@outputs('Disassemble_Order_Flat_File')"
+        },
+        "runAfter": {
+          "Disassemble_Order_Flat_File": [
+            "SUCCEEDED"
+          ]
+        }
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "When_a_HTTP_request_is_received": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "method": "POST"
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}
